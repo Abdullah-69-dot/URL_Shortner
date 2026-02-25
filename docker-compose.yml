@@ -1,0 +1,58 @@
+version: '3.8'
+
+services:
+  # Main Django Application
+  web:
+    build: .
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    environment:
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_HOST_SHARD1=db_shard1
+      - DB_HOST_SHARD2=db_shard2
+      - DB_HOST_SHARD3=db_shard3
+      - REDIS_URL=redis://redis:6379/1
+    depends_on:
+      - db_shard1
+      - db_shard2
+      - db_shard3
+      - redis
+
+  # Redis for Caching
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+  # Database Shard 1
+  db_shard1:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: shard_1
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "5433:5432"
+
+  # Database Shard 2
+  db_shard2:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: shard_2
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "5434:5432"
+
+  # Database Shard 3
+  db_shard3:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: shard_3
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "5435:5432"

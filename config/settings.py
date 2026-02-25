@@ -58,8 +58,34 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    },
+    'shard_1': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.getenv('DB_NAME_SHARD1', 'shard_1'),
+        'USER': os.getenv('DB_USER', 'shortener_user'),
+        'PASSWORD': os.getenv('DB_PASSWORD', 'secret_postgres_pass'),
+        'HOST': os.getenv('DB_HOST_SHARD1', 'localhost'),
+        'PORT': os.getenv('DB_PORT_SHARD1', '5433'),
+    },
+    'shard_2': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.getenv('DB_NAME_SHARD2', 'shard_2'),
+        'USER': os.getenv('DB_USER', 'shortener_user'),
+        'PASSWORD': os.getenv('DB_PASSWORD', 'secret_postgres_pass'),
+        'HOST': os.getenv('DB_HOST_SHARD2', 'localhost'),
+        'PORT': os.getenv('DB_PORT_SHARD2', '5434'),
+    },
+    'shard_3': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.getenv('DB_NAME_SHARD3', 'shard_3'),
+        'USER': os.getenv('DB_USER', 'shortener_user'),
+        'PASSWORD': os.getenv('DB_PASSWORD', 'secret_postgres_pass'),
+        'HOST': os.getenv('DB_HOST_SHARD3', 'localhost'),
+        'PORT': os.getenv('DB_PORT_SHARD3', '5435'),
+    },
 }
+
+DATABASE_ROUTERS = ['core.shard_router.ShardRouter']
 
 AUTH_PASSWORD_VALIDATORS = [
     {
