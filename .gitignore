@@ -1,0 +1,52 @@
+# ===== Python =====
+__pycache__/
+*.py[cod]
+*$py.class
+
+# ===== Virtual Environments =====
+venv/
+env/
+.venv/
+
+# ===== Environment variables =====
+.env
+.env.*
+
+# ===== Django =====
+*.log
+local_settings.py
+db.sqlite3
+media/
+
+# ===== Flask =====
+instance/
+.webassets-cache
+
+# ===== VS Code =====
+.vscode/
+
+# ===== PyCharm =====
+.idea/
+
+# ===== OS =====
+.DS_Store
+Thumbs.db
+
+# ===== Build =====
+build/
+dist/
+*.egg-info/
+
+# ===== Jupyter =====
+.ipynb_checkpoints/
+
+# ===== Node (لو فيه فرونت) =====
+node_modules/
+
+# ===== Coverage & Tests =====
+.coverage
+htmlcov/
+.pytest_cache/
+
+# ===== Migrations (اختياري) =====
+# migrations/
