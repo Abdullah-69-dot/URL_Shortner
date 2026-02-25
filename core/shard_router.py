@@ -1,3 +1,4 @@
+import sys
 from core.consistent_hash import hash_ring
 
 class ShardRouter:
@@ -49,7 +50,12 @@ class ShardRouter:
         """
         Ensure the URL model is only migrated to the shards, and
         other models (admin, auth, etc.) go to the default DB.
+        
+        Allows migration on 'default' if running tests.
         """
+        if 'test' in sys.argv:
+            return True
+
         if app_label == 'urls_app':
             # Run migrations for urls_app on all shards, but NOT on default
             # (In production, we might want to skip default entirely for sharded tables)

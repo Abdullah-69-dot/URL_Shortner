@@ -1,4 +1,5 @@
 import os
+import sys
 from pathlib import Path
 from dotenv import load_dotenv
 
@@ -32,6 +33,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'core.middleware.RequestLoggingMiddleware',
+    'core.middleware.GlobalExceptionHandlerMiddleware',
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -54,36 +57,56 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'config.wsgi.application'
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    },
-    'shard_1': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('DB_NAME_SHARD1', 'shard_1'),
-        'USER': os.getenv('DB_USER', 'shortener_user'),
-        'PASSWORD': os.getenv('DB_PASSWORD', 'secret_postgres_pass'),
-        'HOST': os.getenv('DB_HOST_SHARD1', 'localhost'),
-        'PORT': os.getenv('DB_PORT_SHARD1', '5433'),
-    },
-    'shard_2': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('DB_NAME_SHARD2', 'shard_2'),
-        'USER': os.getenv('DB_USER', 'shortener_user'),
-        'PASSWORD': os.getenv('DB_PASSWORD', 'secret_postgres_pass'),
-        'HOST': os.getenv('DB_HOST_SHARD2', 'localhost'),
-        'PORT': os.getenv('DB_PORT_SHARD2', '5434'),
-    },
-    'shard_3': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('DB_NAME_SHARD3', 'shard_3'),
-        'USER': os.getenv('DB_USER', 'shortener_user'),
-        'PASSWORD': os.getenv('DB_PASSWORD', 'secret_postgres_pass'),
-        'HOST': os.getenv('DB_HOST_SHARD3', 'localhost'),
-        'PORT': os.getenv('DB_PORT_SHARD3', '5435'),
-    },
-}
+if 'test' in sys.argv:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'test_db.sqlite3',
+        },
+        'shard_1': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'test_shard_1.sqlite3',
+        },
+        'shard_2': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'test_shard_2.sqlite3',
+        },
+        'shard_3': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'test_shard_3.sqlite3',
+        },
+    }
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        },
+        'shard_1': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': os.getenv('DB_NAME_SHARD1', 'shard_1'),
+            'USER': os.getenv('DB_USER', 'shortener_user'),
+            'PASSWORD': os.getenv('DB_PASSWORD', 'secret_postgres_pass'),
+            'HOST': os.getenv('DB_HOST_SHARD1', 'localhost'),
+            'PORT': os.getenv('DB_PORT_SHARD1', '5433'),
+        },
+        'shard_2': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': os.getenv('DB_NAME_SHARD2', 'shard_2'),
+            'USER': os.getenv('DB_USER', 'shortener_user'),
+            'PASSWORD': os.getenv('DB_PASSWORD', 'secret_postgres_pass'),
+            'HOST': os.getenv('DB_HOST_SHARD2', 'localhost'),
+            'PORT': os.getenv('DB_PORT_SHARD2', '5434'),
+        },
+        'shard_3': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': os.getenv('DB_NAME_SHARD3', 'shard_3'),
+            'USER': os.getenv('DB_USER', 'shortener_user'),
+            'PASSWORD': os.getenv('DB_PASSWORD', 'secret_postgres_pass'),
+            'HOST': os.getenv('DB_HOST_SHARD3', 'localhost'),
+            'PORT': os.getenv('DB_PORT_SHARD3', '5435'),
+        },
+    }
 
 DATABASE_ROUTERS = ['core.shard_router.ShardRouter']
 
@@ -109,15 +132,22 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
-CACHES = {
-    "default": {
-        "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": os.getenv("REDIS_URL", "redis://127.0.0.1:6379/1"),
-        "OPTIONS": {
-            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+if 'test' in sys.argv:
+    CACHES = {
+        "default": {
+            "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
         }
     }
-}
+else:
+    CACHES = {
+        "default": {
+            "BACKEND": "django_redis.cache.RedisCache",
+            "LOCATION": os.getenv("REDIS_URL", "redis://127.0.0.1:6379/1"),
+            "OPTIONS": {
+                "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            }
+        }
+    }
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [

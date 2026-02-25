@@ -1,6 +1,6 @@
 import logging
 from django.core.cache import cache
-from .models import URL # This might cause circular import in some setups, but here it's fine or we use strings
+from urls_app.models import URL
 
 logger = logging.getLogger(__name__)
 
