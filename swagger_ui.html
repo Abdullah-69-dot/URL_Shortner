@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>URL Shortener API - Swagger UI</title>
+    <link rel="stylesheet" type="text/css" href="https://unpkg.com/swagger-ui-dist@5/swagger-ui.css" />
+    <style>
+        html { box-sizing: border-box; overflow: -moz-scrollbars-vertical; overflow-y: scroll; }
+        *, *:before, *:after { box-sizing: inherit; }
+        body { margin: 0; background: #fafafa; }
+    </style>
+</head>
+<body>
+    <div id="swagger-ui"></div>
+    <script src="https://unpkg.com/swagger-ui-dist@5/swagger-ui-bundle.js" charset="UTF-8"></script>
+    <script src="https://unpkg.com/swagger-ui-dist@5/swagger-ui-standalone-preset.js" charset="UTF-8"></script>
+    <script>
+    window.onload = function() {
+        const spec = {
+            "openapi": "3.0.0",
+            "info": {
+                "title": "URL Shortener API",
+                "description": "A production-ready API for shortening URLs, managing them, and tracking statistics.",
+                "version": "1.0.0"
+            },
+            "servers": [
+                {
+                    "url": "http://localhost:8000/api",
+                    "description": "Local development server"
+                }
+            ],
+            "paths": {
+                "/shorten": {
+                    "post": {
+                        "summary": "Create a shortened URL",
+                        "description": "Provides a long URL and receives a unique short code.",
+                        "requestBody": {
+                            "required": true,
+                            "content": {
+                                "application/json": {
+                                    "schema": {
+                                        "$ref": "#/components/schemas/URLRequest"
+                                    },
+                                    "example": {
+                                        "url": "https://www.google.com"
+                                    }
+                                }
+                            }
+                        },
+                        "responses": {
+                            "201": {
+                                "description": "Successfully created",
+                                "content": {
+                                    "application/json": {
+                                        "schema": {
+                                            "$ref": "#/components/schemas/URLResponse"
+                                        }
+                                    }
+                                }
+                            },
+                            "400": {
+                                "description": "Invalid input"
+                            }
+                        }
+                    }
+                },
+                "/shorten/{shortCode}": {
+                    "get": {
+                        "summary": "Retrieve a shortened URL",
+                        "parameters": [
+                            {
+                                "name": "shortCode",
+                                "in": "path",
+                                "required": true,
+                                "schema": {
+                                    "type": "string"
+                                },
+                                "description": "The unique short code"
+                            }
+                        ],
+                        "responses": {
+                            "200": {
+                                "description": "Success",
+                                "content": {
+                                    "application/json": {
+                                        "schema": {
+                                            "$ref": "#/components/schemas/URLResponse"
+                                        }
+                                    }
+                                }
+                            },
+                            "404": {
+                                "description": "Not found"
+                            }
+                        }
+                    },
+                    "put": {
+                        "summary": "Update a shortened URL",
+                        "parameters": [
+                            {
+                                "name": "shortCode",
+                                "in": "path",
+                                "required": true,
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        ],
+                        "requestBody": {
+                            "required": true,
+                            "content": {
+                                "application/json": {
+                                    "schema": {
+                                        "$ref": "#/components/schemas/URLRequest"
+                                    }
+                                }
+                            }
+                        },
+                        "responses": {
+                            "200": {
+                                "description": "Successfully updated",
+                                "content": {
+                                    "application/json": {
+                                        "schema": {
+                                            "$ref": "#/components/schemas/URLResponse"
+                                        }
+                                    }
+                                }
+                            },
+                            "404": {
+                                "description": "Not found"
+                            }
+                        }
+                    },
+                    "delete": {
+                        "summary": "Delete a shortened URL",
+                        "parameters": [
+                            {
+                                "name": "shortCode",
+                                "in": "path",
+                                "required": true,
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        ],
+                        "responses": {
+                            "204": {
+                                "description": "Successfully deleted"
+                            },
+                            "404": {
+                                "description": "Not found"
+                            }
+                        }
+                    }
+                },
+                "/shorten/{shortCode}/stats": {
+                    "get": {
+                        "summary": "Get URL statistics",
+                        "parameters": [
+                            {
+                                "name": "shortCode",
+                                "in": "path",
+                                "required": true,
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        ],
+                        "responses": {
+                            "200": {
+                                "description": "Success",
+                                "content": {
+                                    "application/json": {
+                                        "schema": {
+                                            "$ref": "#/components/schemas/URLStatsResponse"
+                                        }
+                                    }
+                                }
+                            },
+                            "404": {
+                                "description": "Not found"
+                            }
+                        }
+                    }
+                }
+            },
+            "components": {
+                "schemas": {
+                    "URLRequest": {
+                        "type": "object",
+                        "properties": {
+                            "url": {
+                                "type": "string",
+                                "format": "uri",
+                                "description": "The target long URL"
+                            }
+                        },
+                        "required": ["url"]
+                    },
+                    "URLResponse": {
+                        "type": "object",
+                        "properties": {
+                            "id": { "type": "integer" },
+                            "url": { "type": "string" },
+                            "shortCode": { "type": "string" },
+                            "createdAt": { "type": "string", "format": "date-time" },
+                            "updatedAt": { "type": "string", "format": "date-time" }
+                        }
+                    },
+                    "URLStatsResponse": {
+                        "allOf": [
+                            { "$ref": "#/components/schemas/URLResponse" },
+                            {
+                                "type": "object",
+                                "properties": {
+                                    "accessCount": { "type": "integer" }
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        };
+
+        const ui = SwaggerUIBundle({
+            spec: spec,
+            dom_id: '#swagger-ui',
+            deepLinking: true,
+            presets: [
+                SwaggerUIBundle.presets.apis,
+                SwaggerUIStandalonePreset
+            ],
+            plugins: [
+                SwaggerUIBundle.plugins.DownloadUrl
+            ],
+            layout: "StandaloneLayout"
+        });
+
+        window.ui = ui;
+    };
+    </script>
+</body>
+</html>

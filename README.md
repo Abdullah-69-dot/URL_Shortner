@@ -25,7 +25,7 @@ A production-grade URL shortening service built with Django and Django REST Fram
 
 ### Run with Docker
 1. Clone the repository.
-2. Initialize environment variables (example provided in `.env`).
+2. Initialize environment variables by copying `.env.example` to `.env` and updating values if necessary.
 3. Build and start the services:
    ```bash
    docker-compose up --build
