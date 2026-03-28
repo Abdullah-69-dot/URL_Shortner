@@ -1,4 +1,5 @@
 from django.urls import path, include
+from django.views.generic import TemplateView
 from django.http import JsonResponse
 from django.contrib import admin
 
@@ -13,4 +14,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('health/', health_check, name='health_check'),
     path('api/', include('urls_app.urls')),
+    path('docs/', TemplateView.as_view(template_name='swagger_ui.html'), name='swagger-ui'),
 ]
